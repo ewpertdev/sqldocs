@@ -423,5 +423,3 @@ FROM prestamos
 GROUP BY estado, YEAR(fecha_concesion)
 ORDER BY año DESC, estado;
 ```
-
-[Would you like me to continue with more sections?]
