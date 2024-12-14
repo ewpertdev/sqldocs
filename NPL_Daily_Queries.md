@@ -1,6 +1,6 @@
 # Daily NPL SQL Practice Queries 🔄
 
-## 1. Morning Routine (Start your day with these)
+## 1. Morning Routine
 
 ### Client Searches
 ```sql
