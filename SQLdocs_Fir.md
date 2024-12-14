@@ -13,6 +13,80 @@ This repository documents my journey learning SQL (Microsoft SQL Server), broken
 - TOP clause (SQL Server's equivalent to LIMIT)
 - DISTINCT keyword
 
+### Key Commands for NPL Context
+```sql
+-- Basic select for debtors
+SELECT dni_nif, nombre FROM deudores;
+
+-- Find specific debtor
+SELECT * FROM deudores 
+WHERE dni_nif = '12345678A';
+
+-- Sort by debt amount
+SELECT * FROM prestamos 
+ORDER BY importe_inicial DESC;
+
+-- Find defaulted loans
+SELECT TOP 100 * FROM prestamos 
+WHERE estado = 'IMPAGADO';
+```
+
+### Pattern Matching for Spanish IDs
+```sql
+-- Find all foreign residents (NIE)
+SELECT * FROM deudores 
+WHERE dni_nif LIKE 'X%';
+
+-- Find all companies (start with A-H)
+SELECT * FROM deudores 
+WHERE dni_nif LIKE '[A-H]%';
+```
+
+### Practice Database
+```sql
+-- Create debtors table
+CREATE TABLE deudores (
+    id INT PRIMARY KEY,
+    dni_nif NVARCHAR(9),
+    nombre NVARCHAR(100),
+    tipo_entidad NVARCHAR(50)
+);
+
+-- Insert sample Spanish debtors
+INSERT INTO deudores VALUES 
+(1, '12345678A', 'Juan Pérez', 'Persona Física'),
+(2, 'X1234567L', 'John Smith', 'Extranjero'),
+(3, 'A12345678', 'Empresa SA', 'Persona Jurídica');
+```
+
+### Common NPL Queries
+```sql
+-- Find all defaulted loans
+SELECT d.dni_nif, d.nombre, p.importe_inicial
+FROM deudores d
+JOIN prestamos p ON d.id = p.id_deudor
+WHERE p.estado = 'IMPAGADO';
+
+-- Calculate total debt by type
+SELECT tipo_entidad, 
+    COUNT(*) as total_deudores,
+    SUM(p.importe_inicial) as deuda_total
+FROM deudores d
+JOIN prestamos p ON d.id = p.id_deudor
+GROUP BY tipo_entidad;
+```
+
+### SQL Server-Specific Notes
+1. Use `NVARCHAR` for Spanish characters
+2. Use `N` prefix for Unicode literals (N'José')
+3. Spanish date format: 'DD/MM/YYYY'
+4. Currency format: '###.###,##€'
+
+### Resources
+- SSMS for Spanish locale
+- Spanish banking regulations
+- DNI/NIE validation rules
+
 ### Key Commands 
 ```sql
 SELECT column(s) FROM table;                -- Basic select
@@ -30,30 +104,6 @@ SELECT TOP n * FROM table;                  -- Limiting results (SQL Server synt
 - Comparison: `=`, `>`, `<`, `>=`, `<=`, `<>` (not equal in SQL Server)
 - Logical: `AND`, `OR`, `NOT`
 - Other: `IN`, `BETWEEN`, `LIKE`
-
-### Practice Database
-```sql
--- Create the products table
-CREATE TABLE products (
-    id INT PRIMARY KEY,
-    name NVARCHAR(100),
-    price DECIMAL(10,2),
-    category NVARCHAR(50)
-);
-
--- Insert sample data
-INSERT INTO products VALUES 
-(1, N'Laptop', 999.99, N'Electronics'),
-(2, N'Headphones', 99.99, N'Electronics'),
-(3, N'Harry Potter Book', 19.99, N'Books'),
-(4, N'Coffee Maker', 79.99, N'Kitchen'),
-(5, N'Smartphone', 599.99, N'Electronics'),
-(6, N'Smart Watch', 199.99, N'Electronics'),
-(7, N'Blender', 49.99, N'Kitchen'),
-(8, N'Science Book', 29.99, N'Books'),
-(9, N'Tablet', 299.99, N'Electronics'),
-(10, N'Toaster', 25.99, N'Kitchen');
-```
 
 ### Sample Queries to Try
 ```sql
@@ -95,13 +145,6 @@ ORDER BY price ASC;
 SELECT * FROM products 
 WHERE category <> N'Electronics';
 ```
-
-### SQL Server-Specific Notes
-1. Use `NVARCHAR` instead of VARCHAR for string columns
-2. Use `N` prefix for Unicode string literals (N'text')
-3. Use `TOP` instead of LIMIT
-4. Use `<>` for not equal (although `!=` also works)
-5. Date format is typically 'YYYY-MM-DD'
 
 ### Resources Used
 - SQL Server Management Studio (SSMS)
